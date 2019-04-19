@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item android:icon="@drawable/star"
+        android:title="Популярні">
+        <menu>
+            <item
+                android:id="@+id/popular_day"
+                android:icon="@drawable/day1"
+                android:title="День" />
+            <item
+                android:id="@+id/popular_week"
+                android:icon="@drawable/day7"
+                android:title="Тиждень" />
+            <item
+                android:id="@+id/popular_month"
+                android:icon="@drawable/day30"
+                android:title="Місяць" />
+        </menu>
+    </item>
+
+    <item android:title="Новинки">
+        <menu>
+            <item
+                android:id="@+id/week_rating"
+                android:icon="@drawable/new_icon"
+                android:title="Рейтинг за тиждень" />
+            <item
+                android:id="@+id/date_rating"
+                android:icon="@drawable/date_icon"
+                android:title="За датою" />
+        </menu>
+    </item>
+
+</menu>
