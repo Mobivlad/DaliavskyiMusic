@@ -7,9 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.nulp.daliavskyimusic.R;
 import com.nulp.daliavskyimusic.logicComponents.parser.ItemInform;
 
@@ -53,17 +55,17 @@ public class MusicItemAdapter extends BaseAdapter {
         if (view == null) {
             view = lInflater.inflate(R.layout.list_item, parent, false);
         }
-
-        ImageView flagView = (ImageView) view.findViewById(R.id.item_image);
+        LinearLayout back_lay = (LinearLayout)view.findViewById(R.id.back_lay);
+        RoundedImageView flagView = (RoundedImageView) view.findViewById(R.id.item_image);
         TextView author = (TextView) view.findViewById(R.id.item_author);
         TextView song = (TextView) view.findViewById(R.id.item_song);
         TextView len = (TextView) view.findViewById(R.id.item_len);
         ItemInform state = objects.get(position);
 
         if(selectedHref.equals(state.getSong_href())){
-            view.setBackgroundColor(Color.argb(255,192,192,192));
+            back_lay.setBackgroundColor(Color.argb(120,250, 15, 15));
         } else {
-            view.setBackgroundColor(Color.argb(255,238,238,238));
+            back_lay.setBackgroundColor(Color.WHITE);
         }
 
         author.setText(state.getAuthor_name());

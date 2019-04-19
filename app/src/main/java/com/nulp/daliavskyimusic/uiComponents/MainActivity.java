@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     Fragment fragment;
 
     PageLoader pl = null;
-
     boolean isPause = true;
 
     @Override
