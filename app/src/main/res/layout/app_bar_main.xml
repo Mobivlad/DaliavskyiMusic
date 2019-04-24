@@ -23,9 +23,17 @@
 
     <FrameLayout
         android:paddingTop="1dp"
+        android:id="@+id/main_list_layout"
         android:layout_width="match_parent"
+        android:paddingBottom="@dimen/bottom_fragment_heigth"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_height="match_parent">
+
+        <com.github.ksoichiro.android.observablescrollview.ObservableListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:listSelector="#EEEEEE" />
         <steelkiwi.com.library.DotsLoaderView
             android:id="@+id/dotsLoaderView"
             android:layout_width="match_parent"
@@ -35,12 +43,6 @@
             android:visibility="visible"
             app:dlv_item_drawable="@drawable/circle_background"
             app:dlv_line_color="@color/point_color" />
-
-        <com.github.ksoichiro.android.observablescrollview.ObservableListView
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:listSelector="#EEEEEE" />
     </FrameLayout>
 
     <fragment
@@ -48,7 +50,7 @@
         android:name="com.nulp.daliavskyimusic.uiComponents.button_fragment"
         android:layout_width="match_parent"
         android:layout_gravity="bottom"
-        android:layout_height="15mm" />
+        android:layout_height="60dp" />
 
 
 </android.support.design.widget.CoordinatorLayout>

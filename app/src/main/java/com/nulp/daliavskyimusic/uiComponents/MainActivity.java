@@ -1,6 +1,7 @@
 package com.nulp.daliavskyimusic.uiComponents;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -12,7 +13,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,13 +23,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.nulp.daliavskyimusic.InfoMusicActivity;
+import com.nulp.daliavskyimusic.OnSwipeTouchListener;
 import com.nulp.daliavskyimusic.logicComponents.MediaPlayerList;
 import com.nulp.daliavskyimusic.logicComponents.PageLoader;
 import com.nulp.daliavskyimusic.R;
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     PageLoader pl = null;
     boolean isPause = true;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,8 +66,10 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationItemClickListener());
-
         dotsLoaderView = (DotsLoaderView)findViewById(R.id.dotsLoaderView);
+
+        LinearLayout fl = findViewById(R.id.button_fragment_button);
+        fl.setOnTouchListener(new SwipeListener(getApplicationContext()));
 
         ObservableListView lw = findViewById(R.id.list);
         lw.setOnItemClickListener(new ListItemClickListener());
@@ -71,14 +78,10 @@ public class MainActivity extends AppCompatActivity {
         ImageButton btnPrev = (ImageButton) findViewById(R.id.button_back);
         ImageButton btnNext = (ImageButton) findViewById(R.id.button_next);
         ImageButton btnPlay = (ImageButton) findViewById(R.id.button_play);
-        ImageButton btnShare = (ImageButton) findViewById(R.id.button_share);
-        ImageButton btnInfo = (ImageButton) findViewById(R.id.button_info);
         ButtonListeners bl = new ButtonListeners(mpl);
         btnPrev.setOnClickListener(bl);
         btnNext.setOnClickListener(bl);
         btnPlay.setOnClickListener(bl);
-        btnShare.setOnClickListener(bl);
-        btnInfo.setOnClickListener(bl);
 
         pl = new PageLoader("https://m.z1.fm/",new String[] {"sort","views"});
         new RetrieveFeedTask().execute(pl);
@@ -168,6 +171,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setPlayerInfo(){
+        RoundedImageView image = findViewById(R.id.select_item_image);
+        TextView auth = findViewById(R.id.item_select_author);
+        TextView song = findViewById(R.id.item_select_song);
+        Glide
+                .with(getApplicationContext())
+                .load(mpl.getCurrentPlayItem().getImage_href())
+                .into(image);
+        int len = Math.min(mpl.getCurrentPlayItem().getAuthor_name().length(),25);
+        song.setText(mpl.getCurrentPlayItem().getAuthor_name().substring(0,len)+"...");
+        len = Math.min(mpl.getCurrentPlayItem().getSong_name().length(),25);
+        auth.setText(mpl.getCurrentPlayItem().getSong_name().substring(0,len)+"...");
+    }
+
     private class NavigationItemClickListener implements NavigationView.OnNavigationItemSelectedListener{
         @Override
         public boolean onNavigationItemSelected(MenuItem item) {
@@ -209,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             mpl.setCurrentPlay(position);
             changeSelections();
+            setPlayerInfo();
         }
     }
 
@@ -299,6 +317,33 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private class SwipeListener extends OnSwipeTouchListener {
+
+        public SwipeListener(Context ctx) {
+            super(ctx);
+        }
+
+        @Override
+        public void onSwipeRight() {
+
+        }
+
+        @Override
+        public void onSwipeLeft() {
+
+        }
+
+        @Override
+        public void onSwipeTop() {
+            Intent i = new Intent(getApplicationContext(), InfoMusicActivity.class);
+            startActivity(i);
+        }
+
+        @Override
+        public void onSwipeBottom() {
+
+        }
+    }
     private class ButtonListeners implements View.OnClickListener {
         private MediaPlayerList mpl;
 
@@ -322,15 +367,6 @@ public class MainActivity extends AppCompatActivity {
                 if(isPause) ((ImageButton) view).setImageResource(R.drawable.pause);
                 else ((ImageButton) view).setImageResource(R.drawable.play);
                 isPause=!isPause;
-            }
-            if(id==R.id.button_info){
-                Intent i = new Intent(MainActivity.this, InfoMusicActivity.class);
-                startActivity(i);
-                overridePendingTransition(R.anim.first_anim,R.anim.second_anim_out);
-            }
-            if(id==R.id.button_share){
-                throw new RuntimeException("App is crashed");
-                //share(mpl.getCurrentPlayItem().toString());
             }
         }
 

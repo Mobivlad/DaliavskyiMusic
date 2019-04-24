@@ -1,79 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="@dimen/bottom_fragment_heigth"
     android:background="@drawable/button_fragment_back"
     tools:context=".uiComponents.button_fragment">
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_height="wrap_content">
+        android:id="@+id/button_fragment_button"
+        android:layout_height="match_parent"
+        android:layout_weight="10"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="4dp">
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="#FFFFFF"
+                app:riv_corner_radius="5dp" />
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/select_item_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/face"
+                app:riv_border_color="#333333"
+                app:riv_border_width="1dip"
+                app:riv_corner_radius="5dp" />
+        </RelativeLayout>
+
         <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_weight="3"
-            android:layout_height="wrap_content">
-            <ImageButton
-                style="@style/MyButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/button_info"
-                android:src="@drawable/list" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:orientation="vertical"
+            android:weightSum="2">
+
             <TextView
+                android:id="@+id/item_select_song"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingTop="4dp"
-                android:text="0:00" />
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                style="@style/MyButtonStyle"
-                android:id="@+id/button_back"
-                android:src="@drawable/backward"/>
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/button_play"
-                style="@style/MyButtonStyle"
-                android:src="@drawable/play"/>
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/button_next"
-                android:layout_weight="1"
-                style="@style/MyButtonStyle"
-                android:src="@drawable/fast_forward"/>
+                android:layout_height="0dp"
+                android:layout_weight="1.25"
+                android:gravity="center_vertical"
+                android:paddingLeft="20px"
+                android:text="Song"
+                android:textStyle="bold" />
+
             <TextView
+                android:id="@+id/item_select_author"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingTop="4dp"
-                android:text="0:00"
-                android:textAlignment="center" />
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/button_share"
-                style="@style/MyButtonStyle"
-                android:src="@drawable/link"/>
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
+                android:gravity="center_vertical"
+                android:paddingLeft="20px"
+                android:text="Author"
+                android:textSize="12sp" />
         </LinearLayout>
 
-        <SeekBar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:minHeight="30dp"
-            android:paddingBottom="10dp"/>
+        <ImageButton
+            android:id="@+id/button_back"
+            style="@style/MyButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:src="@drawable/backward" />
+
+        <ImageButton
+            android:id="@+id/button_play"
+            style="@style/MyButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:src="@drawable/play" />
+
+        <ImageButton
+            android:id="@+id/button_next"
+            style="@style/MyButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:src="@drawable/fast_forward" />
     </LinearLayout>
-
-
 </FrameLayout>
