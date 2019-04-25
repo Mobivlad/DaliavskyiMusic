@@ -28,6 +28,7 @@
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/select_item_image"
+                android:transitionName="music_picture_item"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/face"
@@ -83,11 +84,11 @@
             android:src="@drawable/play" />
 
         <ImageButton
-            android:id="@+id/button_next"
-            style="@style/MyButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:src="@drawable/fast_forward" />
+        android:id="@+id/button_next"
+        style="@style/MyButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:src="@drawable/fast_forward" />
     </LinearLayout>
 </FrameLayout>

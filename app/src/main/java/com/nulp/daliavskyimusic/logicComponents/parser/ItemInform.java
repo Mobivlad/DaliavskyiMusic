@@ -1,6 +1,8 @@
 package com.nulp.daliavskyimusic.logicComponents.parser;
 
-public class ItemInform {
+import java.io.Serializable;
+
+public class ItemInform implements Serializable {
     private String image_href;
     private String len;
     private String author_name;

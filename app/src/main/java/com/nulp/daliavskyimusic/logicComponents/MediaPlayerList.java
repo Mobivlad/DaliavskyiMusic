@@ -5,16 +5,17 @@ import android.content.Context;
 import com.nulp.daliavskyimusic.logicComponents.parser.ItemInform;
 import com.nulp.daliavskyimusic.uiComponents.MusicItemAdapter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MediaPlayerList {
+public class MediaPlayerList implements Serializable{
     public MediaPlayerList() {
         list = new ArrayList<>();
         mia = null;
     }
 
-    private MusicItemAdapter mia;
+    private transient MusicItemAdapter mia;
     private List<ItemInform> list;
     private int currentPlay = -1;
 

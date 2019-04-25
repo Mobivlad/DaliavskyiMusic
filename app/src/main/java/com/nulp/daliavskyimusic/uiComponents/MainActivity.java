@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.support.v4.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,26 +62,26 @@ public class MainActivity extends AppCompatActivity {
         visibleButtonFragment(false);
 
         refreshMediaPlayerList();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationItemClickListener());
-        dotsLoaderView = (DotsLoaderView)findViewById(R.id.dotsLoaderView);
+        dotsLoaderView = findViewById(R.id.dotsLoaderView);
 
         LinearLayout fl = findViewById(R.id.button_fragment_button);
-        fl.setOnTouchListener(new SwipeListener(getApplicationContext()));
 
         ObservableListView lw = findViewById(R.id.list);
         lw.setOnItemClickListener(new ListItemClickListener());
         lw.setOnScrollListener(new ListViewScrollingAction());
 
-        ImageButton btnPrev = (ImageButton) findViewById(R.id.button_back);
-        ImageButton btnNext = (ImageButton) findViewById(R.id.button_next);
-        ImageButton btnPlay = (ImageButton) findViewById(R.id.button_play);
+        ImageButton btnPrev =  findViewById(R.id.button_back);
+        ImageButton btnNext =  findViewById(R.id.button_next);
+        ImageButton btnPlay =  findViewById(R.id.button_play);
         ButtonListeners bl = new ButtonListeners(mpl);
+        fl.setOnClickListener(bl);
         btnPrev.setOnClickListener(bl);
         btnNext.setOnClickListener(bl);
         btnPlay.setOnClickListener(bl);
@@ -90,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -136,6 +139,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK){
+            mpl.setCurrentPlay(data.getExtras().getInt("curent_play"));
+            changeSelections();
+            setPlayerInfo();
+        }
     }
 
     private void visibleButtonFragment(boolean isVisible) {
@@ -317,33 +330,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private class SwipeListener extends OnSwipeTouchListener {
 
-        public SwipeListener(Context ctx) {
-            super(ctx);
-        }
-
-        @Override
-        public void onSwipeRight() {
-
-        }
-
-        @Override
-        public void onSwipeLeft() {
-
-        }
-
-        @Override
-        public void onSwipeTop() {
-            Intent i = new Intent(getApplicationContext(), InfoMusicActivity.class);
-            startActivity(i);
-        }
-
-        @Override
-        public void onSwipeBottom() {
-
-        }
-    }
     private class ButtonListeners implements View.OnClickListener {
         private MediaPlayerList mpl;
 
@@ -367,6 +354,11 @@ public class MainActivity extends AppCompatActivity {
                 if(isPause) ((ImageButton) view).setImageResource(R.drawable.pause);
                 else ((ImageButton) view).setImageResource(R.drawable.play);
                 isPause=!isPause;
+            }
+            if(id==R.id.button_fragment_button){
+                ActivityOptionsCompat options = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation(MainActivity.this, (View)findViewById(R.id.select_item_image), "music_picture_item");
+                startActivityForResult(InfoMusicActivity.getIntent(MainActivity.this,mpl),0, options.toBundle());
             }
         }
 
