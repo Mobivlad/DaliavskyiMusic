@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/author_href"
+        android:icon="@drawable/microphone"
+        android:title="Про автора" />
+    <item
+        android:id="@+id/song_href"
+        android:icon="@drawable/new_icon"
+        android:title="Про пісню" />
+    <item
+        android:id="@+id/download"
+        android:icon="@drawable/download"
+        android:title="Завантажити трек" />
+</menu>

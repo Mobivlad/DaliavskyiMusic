@@ -35,6 +35,20 @@ public class MediaPlayerList implements Serializable{
         this.currentPlay = currentPlay;
     }
 
+    public void nextPlay() {
+        this.currentPlay++;
+        if(currentPlay==list.size()){
+            currentPlay=0;
+        }
+    }
+
+    public void prevPlay() {
+        this.currentPlay--;
+        if(currentPlay==-1){
+            currentPlay=list.size()-1;
+        }
+    }
+
     public boolean adapterIsNull(){
         return mia==null;
     }

@@ -56,7 +56,7 @@ public class MusicItemAdapter extends BaseAdapter {
             view = lInflater.inflate(R.layout.list_item, parent, false);
         }
         LinearLayout back_lay = (LinearLayout)view.findViewById(R.id.back_lay);
-        RoundedImageView flagView = (RoundedImageView) view.findViewById(R.id.item_image);
+        RoundedImageView flagView = view.findViewById(R.id.item_image);
         TextView author = (TextView) view.findViewById(R.id.item_author);
         TextView song = (TextView) view.findViewById(R.id.item_song);
         TextView len = (TextView) view.findViewById(R.id.item_len);

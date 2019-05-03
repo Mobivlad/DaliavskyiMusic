@@ -1,9 +1,8 @@
 package com.nulp.daliavskyimusic.uiComponents;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,13 +19,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.support.v4.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,7 +33,7 @@ import com.bumptech.glide.Glide;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.nulp.daliavskyimusic.InfoMusicActivity;
-import com.nulp.daliavskyimusic.OnSwipeTouchListener;
+import com.nulp.daliavskyimusic.MusicPlayer;
 import com.nulp.daliavskyimusic.logicComponents.MediaPlayerList;
 import com.nulp.daliavskyimusic.logicComponents.PageLoader;
 import com.nulp.daliavskyimusic.R;
@@ -44,18 +41,17 @@ import com.nulp.daliavskyimusic.R;
 import steelkiwi.com.library.DotsLoaderView;
 
 public class MainActivity extends AppCompatActivity {
-
-    MediaPlayerList mpl;
+    
     DotsLoaderView dotsLoaderView;
     Fragment fragment;
 
     PageLoader pl = null;
-    boolean isPause = true;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MusicPlayer.mainActivity = MainActivity.this;
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton btnPrev =  findViewById(R.id.button_back);
         ImageButton btnNext =  findViewById(R.id.button_next);
         ImageButton btnPlay =  findViewById(R.id.button_play);
-        ButtonListeners bl = new ButtonListeners(mpl);
+        ButtonListeners bl = new ButtonListeners();
         fl.setOnClickListener(bl);
         btnPrev.setOnClickListener(bl);
         btnNext.setOnClickListener(bl);
@@ -89,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         pl = new PageLoader("https://m.z1.fm/",new String[] {"sort","views"});
         new RetrieveFeedTask().execute(pl);
     }
-
     boolean doubleBackToExitPressedOnce = false;
     @Override
     public void onBackPressed() {
@@ -105,13 +100,7 @@ public class MainActivity extends AppCompatActivity {
             this.doubleBackToExitPressedOnce = true;
             Toast.makeText(this, "Натисніть ’Назад’ ще раз для виходу", Toast.LENGTH_SHORT).show();
 
-            new Handler().postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    doubleBackToExitPressedOnce=false;
-                }
-            }, 2000);
+            new Handler().postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
         }
     }
 
@@ -144,11 +133,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==RESULT_OK){
-            mpl.setCurrentPlay(data.getExtras().getInt("curent_play"));
-            changeSelections();
-            setPlayerInfo();
-        }
+        changeSelections();
+        setPlayerInfo();
     }
 
     private void visibleButtonFragment(boolean isVisible) {
@@ -165,37 +151,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshMediaPlayerList() {
-        mpl = new MediaPlayerList();
+        MusicPlayer.mpl = new MediaPlayerList();
     }
 
-    private void refreshView(){
+    public void refreshView(){
         visibleListFragment(false);
         new RetrieveFeedTask().execute(pl);
     }
 
-    private void changeSelections(){
+    public void changeSelections(){
         try{
-            MusicItemAdapter adapter = mpl.getAdapter();
-            adapter.setSelectedHref(mpl.getCurrentPlayItem().getSong_href());
+            MusicItemAdapter adapter = MusicPlayer.mpl.getAdapter();
+            adapter.setSelectedHref(MusicPlayer.mpl.getCurrentPlayItem().getSong_href());
             adapter.notifyDataSetChanged();
         } catch (ArrayIndexOutOfBoundsException e){
-            mpl.setCurrentPlay(0);
+            MusicPlayer.mpl.setCurrentPlay(0);
             changeSelections();
         }
     }
 
-    private void setPlayerInfo(){
+    public void setPlayerInfo(){
         RoundedImageView image = findViewById(R.id.select_item_image);
         TextView auth = findViewById(R.id.item_select_author);
         TextView song = findViewById(R.id.item_select_song);
         Glide
                 .with(getApplicationContext())
-                .load(mpl.getCurrentPlayItem().getImage_href())
+                .load(MusicPlayer.mpl.getCurrentPlayItem().getImage_href())
                 .into(image);
-        int len = Math.min(mpl.getCurrentPlayItem().getAuthor_name().length(),25);
-        song.setText(mpl.getCurrentPlayItem().getAuthor_name().substring(0,len)+"...");
-        len = Math.min(mpl.getCurrentPlayItem().getSong_name().length(),25);
-        auth.setText(mpl.getCurrentPlayItem().getSong_name().substring(0,len)+"...");
+        int len = Math.min(MusicPlayer.mpl.getCurrentPlayItem().getAuthor_name().length(),25);
+        song.setText(MusicPlayer.mpl.getCurrentPlayItem().getAuthor_name().substring(0,len)+"...");
+        len = Math.min(MusicPlayer.mpl.getCurrentPlayItem().getSong_name().length(),25);
+        auth.setText(MusicPlayer.mpl.getCurrentPlayItem().getSong_name().substring(0,len)+"...");
     }
 
     private class NavigationItemClickListener implements NavigationView.OnNavigationItemSelectedListener{
@@ -227,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 pl = new PageLoader("https://m.z1.fm/new",new String[]{"sort","date"});
                 refreshView();
             }
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
             return true;
         }
@@ -237,19 +223,20 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            mpl.setCurrentPlay(position);
+            MusicPlayer.mpl.setCurrentPlay(position);
             changeSelections();
             setPlayerInfo();
+            MusicPlayer.updateMediaPlayer();
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class RetrieveFeedTask extends AsyncTask<Object, Integer, Integer> {
 
         @Override
         protected Integer doInBackground(Object... args) {
             PageLoader pl = ((PageLoader) args[0]);
-            int _size = pl.loadTo(mpl.getList());
-            return _size;
+            return pl.loadTo(MusicPlayer.mpl.getList());
         }
 
         @Override
@@ -265,33 +252,27 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage("Запит не дав результатів.")
                         .setCancelable(false)
                         .setPositiveButton("Повторити",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int i) {
-                                        new RetrieveFeedTask().execute(pl);
-                                        dialog.cancel();
-                                    }
+                                (dialog, i) -> {
+                                    new RetrieveFeedTask().execute(pl);
+                                    dialog.cancel();
                                 })
                         .setNegativeButton("Ок",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        pl = new PageLoader("https://m.z1.fm/",new String[]{"sort","day"});
-                                        refreshMediaPlayerList();
-                                        new RetrieveFeedTask().execute(pl);
-                                        dialog.cancel();
-                                    }
+                                (dialog, id) -> {
+                                    pl = new PageLoader("https://m.z1.fm/",new String[]{"sort","day"});
+                                    refreshMediaPlayerList();
+                                    new RetrieveFeedTask().execute(pl);
+                                    dialog.cancel();
                                 });
                 AlertDialog alert = builder.create();
                 alert.show();
             } else {
-                if(mpl.adapterIsNull()) {
-                    mpl.createAdapter(getApplicationContext());
-                    ((ObservableListView)findViewById(R.id.list)).setAdapter(mpl.getAdapter());
+                if(MusicPlayer.mpl.adapterIsNull()) {
+                    MusicPlayer.mpl.createAdapter(getApplicationContext());
+                    ((ObservableListView)findViewById(R.id.list)).setAdapter(MusicPlayer.mpl.getAdapter());
                     visibleListFragment(true);
                     visibleButtonFragment(true);
                 } else {
-                    mpl.getAdapter().notifyDataSetChanged();
+                    MusicPlayer.mpl.getAdapter().notifyDataSetChanged();
                 }
             }
             dotsLoaderView.hide();
@@ -332,46 +313,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ButtonListeners implements View.OnClickListener {
-        private MediaPlayerList mpl;
-
-        public ButtonListeners(MediaPlayerList mpl) {
-            this.mpl = mpl;
-        }
 
         @Override
         public void onClick(View view) {
             int id = view.getId();
             if(id==R.id.button_next){
-                mpl.setCurrentPlay(mpl.getCurrentPlayIndex()+1);
+                MusicPlayer.mpl.nextPlay();
                 changeSelections();
-
+                setPlayerInfo();
+                MusicPlayer.updateMediaPlayer();
             }
             if(id==R.id.button_back){
-                mpl.setCurrentPlay(mpl.getCurrentPlayIndex()-1);
+                MusicPlayer.mpl.prevPlay();
                 changeSelections();
+                setPlayerInfo();
+                MusicPlayer.updateMediaPlayer();
             }
             if(id==R.id.button_play){
-                if(isPause) ((ImageButton) view).setImageResource(R.drawable.pause);
-                else ((ImageButton) view).setImageResource(R.drawable.play);
-                isPause=!isPause;
+                if(MusicPlayer.isPause){
+                    ((ImageButton) view).setImageResource(R.drawable.pause);
+                    MusicPlayer.playMediaPlayer();
+                }
+                else {
+                    ((ImageButton) view).setImageResource(R.drawable.play);
+                    MusicPlayer.pauseMediaPlayer();
+                }
+                MusicPlayer.isPause=!MusicPlayer.isPause;
             }
             if(id==R.id.button_fragment_button){
                 ActivityOptionsCompat options = ActivityOptionsCompat.
                         makeSceneTransitionAnimation(MainActivity.this, (View)findViewById(R.id.select_item_image), "music_picture_item");
-                startActivityForResult(InfoMusicActivity.getIntent(MainActivity.this,mpl),0, options.toBundle());
-            }
-        }
-
-        private void share(String s){
-            Intent waIntent = new Intent(Intent.ACTION_SEND);
-            waIntent.setType("text/plain");
-            if (waIntent != null) {
-                waIntent.putExtra(Intent.EXTRA_TEXT, s);//
-                startActivity(Intent.createChooser(waIntent, "Поширити посилання з"));
-            }
-            else
-            {
-                Toast.makeText(getApplicationContext(), "Застосувань для поширення не знайдено", Toast.LENGTH_SHORT).show();
+                startActivityForResult(InfoMusicActivity.getIntent(MainActivity.this),0, options.toBundle());
             }
         }
     }
