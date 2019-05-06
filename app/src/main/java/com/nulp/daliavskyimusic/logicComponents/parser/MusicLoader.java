@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicLoader {
-    public static List<ItemInform> getData(String href, String[] args){
+    public static List<SongInformation> getData(String href, String[] args){
         Document doc = null;
         final String base = "https://z1.fm";
-        List<ItemInform> items = new ArrayList<>();
+        List<SongInformation> items = new ArrayList<>();
         try {
             Connection connection = Jsoup.connect(href).data(args);
             connection.userAgent("Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36");
@@ -35,7 +35,7 @@ public class MusicLoader {
             String author_href = base + song_info.get(3).child(3).attr("href");
             String song_href = base + song_info.get(3).child(2).attr("href");
             String download_href = song_href.replace("song","download");
-            items.add(new ItemInform(img_href,len,author_name,author_href,song_name,song_href,download_href));
+            items.add(new SongInformation(img_href,len,author_name,author_href,song_name,song_href,download_href));
         }
         return items;
     }

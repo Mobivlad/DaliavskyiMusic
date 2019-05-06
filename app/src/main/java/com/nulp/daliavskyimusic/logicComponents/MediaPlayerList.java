@@ -2,7 +2,7 @@ package com.nulp.daliavskyimusic.logicComponents;
 
 import android.content.Context;
 
-import com.nulp.daliavskyimusic.logicComponents.parser.ItemInform;
+import com.nulp.daliavskyimusic.logicComponents.parser.SongInformation;
 import com.nulp.daliavskyimusic.uiComponents.MusicItemAdapter;
 
 import java.io.Serializable;
@@ -16,10 +16,10 @@ public class MediaPlayerList implements Serializable{
     }
 
     private transient MusicItemAdapter mia;
-    private List<ItemInform> list;
+    private List<SongInformation> list;
     private int currentPlay = -1;
 
-    public List<ItemInform> getList() {
+    public List<SongInformation> getList() {
         return list;
     }
 
@@ -27,12 +27,13 @@ public class MediaPlayerList implements Serializable{
         return currentPlay;
     }
 
-    public ItemInform getCurrentPlayItem() {
+    public SongInformation getCurrentPlayItem() {
         return list.get(currentPlay);
     }
 
     public void setCurrentPlay(int currentPlay) {
         this.currentPlay = currentPlay;
+        MusicPlayer.currentSong = list.get(currentPlay);
     }
 
     public void nextPlay() {
@@ -40,6 +41,7 @@ public class MediaPlayerList implements Serializable{
         if(currentPlay==list.size()){
             currentPlay=0;
         }
+        MusicPlayer.currentSong = list.get(currentPlay);
     }
 
     public void prevPlay() {
@@ -47,6 +49,15 @@ public class MediaPlayerList implements Serializable{
         if(currentPlay==-1){
             currentPlay=list.size()-1;
         }
+        MusicPlayer.currentSong = list.get(currentPlay);
+    }
+
+    public String[] getHrefArray(){
+        String s[] = new String[list.size()];
+        for(int i=0;i<list.size();i++){
+            s[i]=list.get(i).getSong_href();
+        }
+        return s;
     }
 
     public boolean adapterIsNull(){

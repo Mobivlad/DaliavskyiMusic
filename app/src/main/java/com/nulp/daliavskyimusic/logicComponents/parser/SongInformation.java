@@ -2,7 +2,7 @@ package com.nulp.daliavskyimusic.logicComponents.parser;
 
 import java.io.Serializable;
 
-public class ItemInform implements Serializable {
+public class SongInformation implements Serializable {
     private String image_href;
     private String len;
     private String author_name;
@@ -67,7 +67,7 @@ public class ItemInform implements Serializable {
         this.song_url = song_url;
     }
 
-    public ItemInform(String image_href, String len, String author_name, String author_href, String song_name, String song_href, String song_url) {
+    public SongInformation(String image_href, String len, String author_name, String author_href, String song_name, String song_href, String song_url) {
         this.image_href = image_href;
         this.len = len;
         this.author_name = author_name;
@@ -76,8 +76,6 @@ public class ItemInform implements Serializable {
         this.song_href = song_href;
         this.song_url = song_url;
     }
-
-
 
     @Override
     public String toString() {

@@ -12,4 +12,7 @@
         android:id="@+id/download"
         android:icon="@drawable/download"
         android:title="Завантажити трек" />
+    <item
+        android:id="@+id/share"
+        android:title="Поширити трек" />
 </menu>

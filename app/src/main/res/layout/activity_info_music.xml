@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:weightSum="10"
     android:background="@drawable/button_fragment_back"
-    tools:context=".InfoMusicActivity">
+    tools:context=".uiComponents.Activities.InfoMusicActivity">
     <RelativeLayout
         android:layout_width="match_parent"
         android:gravity="center"
@@ -23,6 +23,7 @@
             android:layout_height="270dp"
             app:riv_corner_radius="135dp"
             android:id="@+id/select_item_image"
+            android:scaleType="fitXY"
             android:transitionName="music_picture_item"
             android:src="@drawable/item_image" />
 

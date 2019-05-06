@@ -1,4 +1,4 @@
-package com.nulp.daliavskyimusic;
+package com.nulp.daliavskyimusic.logicComponents;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -8,17 +8,18 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.nulp.daliavskyimusic.logicComponents.MediaPlayerList;
-import com.nulp.daliavskyimusic.uiComponents.MainActivity;
+import com.nulp.daliavskyimusic.R;
+import com.nulp.daliavskyimusic.logicComponents.parser.SongInformation;
+import com.nulp.daliavskyimusic.uiComponents.Activities.InfoMusicActivity;
+import com.nulp.daliavskyimusic.uiComponents.Activities.MainActivity;
 
 import java.io.IOException;
 import android.os.Handler;
 
-import rm.com.audiowave.AudioWaveView;
-
 public class MusicPlayer {
     public static Handler h = new Handler();
     public static MainActivity mainActivity;
+    public static SongInformation currentSong;
     public static InfoMusicActivity infoActivity;
     public static MediaPlayerList mpl;
     public static MediaPlayer mp;
@@ -59,7 +60,12 @@ public class MusicPlayer {
         }
     }
     public static void playMediaPlayer(){
-        mp.start();
+        if(mp==null){
+            MusicPlayer.updateMediaPlayer();
+        } else {
+            mp.start();
+        }
+
     }
     public static void pauseMediaPlayer(){
         mp.pause();
@@ -86,7 +92,6 @@ public class MusicPlayer {
             if(infoActivity!=null){
                 TextView tv = ((TextView)infoActivity.findViewById(R.id.current_len));
                 tv.setText(String.format("%02d:%02d", mp.getCurrentPosition()/1000/60,mp.getCurrentPosition()/1000%60));
-                //AudioWaveView waveView = infoActivity.findViewById(R.id.wave);
                 SeekBar waveView = infoActivity.findViewById(R.id.wave);
                 waveView.setProgress(mp.getCurrentPosition());
             }

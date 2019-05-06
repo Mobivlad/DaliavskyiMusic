@@ -6,14 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.nulp.daliavskyimusic.R;
-import com.nulp.daliavskyimusic.logicComponents.parser.ItemInform;
+import com.nulp.daliavskyimusic.logicComponents.parser.SongInformation;
 
 import java.util.List;
 
@@ -21,14 +20,14 @@ import java.util.List;
 public class MusicItemAdapter extends BaseAdapter {
     private Context ctx;
     private LayoutInflater lInflater;
-    private List<ItemInform> objects;
+    private List<SongInformation> objects;
     private String selectedHref = "";
 
     public void setSelectedHref(String selectedHref) {
         this.selectedHref = selectedHref;
     }
 
-    public MusicItemAdapter(Context context, List<ItemInform> products) {
+    public MusicItemAdapter(Context context, List<SongInformation> products) {
         ctx = context;
         objects = products;
         lInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -60,7 +59,7 @@ public class MusicItemAdapter extends BaseAdapter {
         TextView author = (TextView) view.findViewById(R.id.item_author);
         TextView song = (TextView) view.findViewById(R.id.item_song);
         TextView len = (TextView) view.findViewById(R.id.item_len);
-        ItemInform state = objects.get(position);
+        SongInformation state = objects.get(position);
 
         if(selectedHref.equals(state.getSong_href())){
             back_lay.setBackgroundColor(Color.argb(120,250, 15, 15));

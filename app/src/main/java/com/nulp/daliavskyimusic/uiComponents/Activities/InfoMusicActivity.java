@@ -1,29 +1,21 @@
-package com.nulp.daliavskyimusic;
+package com.nulp.daliavskyimusic.uiComponents.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.nulp.daliavskyimusic.logicComponents.MusicPlayer;
+import com.nulp.daliavskyimusic.R;
 import com.nulp.daliavskyimusic.logicComponents.MediaPlayerList;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import rm.com.audiowave.AudioWaveView;
-import wseemann.media.FFmpegMediaMetadataRetriever;
 
 public class InfoMusicActivity extends AppCompatActivity {
 
@@ -32,11 +24,11 @@ public class InfoMusicActivity extends AppCompatActivity {
     }
 
     public void change(){
-        ((TextView)findViewById(R.id.music_item_song_name)).setText(mp.getCurrentPlayItem().getSong_name());
-        ((TextView)findViewById(R.id.music_item_author_name)).setText(mp.getCurrentPlayItem().getAuthor_name());
+        ((TextView)findViewById(R.id.music_item_song_name)).setText(MusicPlayer.currentSong.getSong_name());
+        ((TextView)findViewById(R.id.music_item_author_name)).setText(MusicPlayer.currentSong.getAuthor_name());
         Glide
                 .with(getApplicationContext())
-                .load(mp.getCurrentPlayItem().getImage_href())
+                .load(MusicPlayer.currentSong.getImage_href())
                 .placeholder(R.drawable.face)
                 .into((RoundedImageView)findViewById(R.id.select_item_image));
         if(MusicPlayer.isPause){
@@ -65,7 +57,6 @@ public class InfoMusicActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)MusicPlayer.mp.seekTo(progress);
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 MusicPlayer.isPause = true;
@@ -80,19 +71,21 @@ public class InfoMusicActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.full_len)).setText(String.format("%02d:%02d", MusicPlayer.mp.getDuration()/1000/60,MusicPlayer.mp.getDuration()/1000%60));
 
     }
-
     public void showPopup(View v){
         PopupMenu p = new PopupMenu(InfoMusicActivity.this,v);
         p.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()){
                 case R.id.author_href:
-                    open(MusicPlayer.mpl.getCurrentPlayItem().getSong_href());
+                    open(MusicPlayer.currentSong.getAuthor_href());
                     return true;
                 case R.id.song_href:
-                    open(MusicPlayer.mpl.getCurrentPlayItem().getAuthor_href());
+                    open(MusicPlayer.currentSong.getSong_href());
                     return true;
                 case R.id.download:
-                    open(MusicPlayer.mpl.getCurrentPlayItem().getSong_url());
+                    open(MusicPlayer.currentSong.getSong_url());
+                    return true;
+                case R.id.share:
+                    share(MusicPlayer.currentSong.getAuthor_name()+" "+MusicPlayer.currentSong.getSong_name()+"( "+MusicPlayer.currentSong.getSong_href()+" )");
                     return true;
             }
             return false;

@@ -1,13 +1,18 @@
-package com.nulp.daliavskyimusic.uiComponents;
+package com.nulp.daliavskyimusic.uiComponents.Activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,11 +37,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.nulp.daliavskyimusic.InfoMusicActivity;
-import com.nulp.daliavskyimusic.MusicPlayer;
+import com.nulp.daliavskyimusic.logicComponents.MusicPlayer;
 import com.nulp.daliavskyimusic.logicComponents.MediaPlayerList;
-import com.nulp.daliavskyimusic.logicComponents.PageLoader;
+import com.nulp.daliavskyimusic.logicComponents.parser.PageLoader;
 import com.nulp.daliavskyimusic.R;
+import com.nulp.daliavskyimusic.uiComponents.MusicItemAdapter;
+import com.nulp.daliavskyimusic.uiComponents.NotificationHelper;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Arrays;
 
 import steelkiwi.com.library.DotsLoaderView;
 
@@ -44,13 +55,14 @@ public class MainActivity extends AppCompatActivity {
     
     DotsLoaderView dotsLoaderView;
     Fragment fragment;
-
+    boolean isStart = true;
     PageLoader pl = null;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isReadStoragePermissionGranted();
         MusicPlayer.mainActivity = MainActivity.this;
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -162,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
     public void changeSelections(){
         try{
             MusicItemAdapter adapter = MusicPlayer.mpl.getAdapter();
-            adapter.setSelectedHref(MusicPlayer.mpl.getCurrentPlayItem().getSong_href());
+            adapter.setSelectedHref(MusicPlayer.currentSong.getSong_href());
             adapter.notifyDataSetChanged();
         } catch (ArrayIndexOutOfBoundsException e){
             MusicPlayer.mpl.setCurrentPlay(0);
@@ -174,14 +186,16 @@ public class MainActivity extends AppCompatActivity {
         RoundedImageView image = findViewById(R.id.select_item_image);
         TextView auth = findViewById(R.id.item_select_author);
         TextView song = findViewById(R.id.item_select_song);
-        Glide
+        if(MusicPlayer.currentSong.getImage_href().equals("no_image")){
+            image.setImageResource(R.drawable.face);
+        } else Glide
                 .with(getApplicationContext())
-                .load(MusicPlayer.mpl.getCurrentPlayItem().getImage_href())
+                .load(MusicPlayer.currentSong.getImage_href())
                 .into(image);
-        int len = Math.min(MusicPlayer.mpl.getCurrentPlayItem().getAuthor_name().length(),25);
-        song.setText(MusicPlayer.mpl.getCurrentPlayItem().getAuthor_name().substring(0,len)+"...");
-        len = Math.min(MusicPlayer.mpl.getCurrentPlayItem().getSong_name().length(),25);
-        auth.setText(MusicPlayer.mpl.getCurrentPlayItem().getSong_name().substring(0,len)+"...");
+        int len = Math.min(MusicPlayer.currentSong.getAuthor_name().length(),25);
+        song.setText(MusicPlayer.currentSong.getAuthor_name().substring(0,len)+"...");
+        len = Math.min(MusicPlayer.currentSong.getSong_name().length(),25);
+        auth.setText(MusicPlayer.currentSong.getSong_name().substring(0,len)+"...");
     }
 
     private class NavigationItemClickListener implements NavigationView.OnNavigationItemSelectedListener{
@@ -275,7 +289,17 @@ public class MainActivity extends AppCompatActivity {
                     MusicPlayer.mpl.getAdapter().notifyDataSetChanged();
                 }
             }
+            if(MusicPlayer.mp==null){
+                MusicPlayer.mpl.setCurrentPlay(0);
+                changeSelections();
+                setPlayerInfo();
+            }
             dotsLoaderView.hide();
+            if(isStart){
+                notif();
+            }
+            isStart = false;
+
         }
     }
 
@@ -311,7 +335,56 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    public  boolean isReadStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
+                return false;
+            }
+        }
+        else {
+            return true;
+        }
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 2:
+                if(grantResults[0]!= PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(MainActivity.this,"Програмі необхідний доступ для читання/запису",Toast.LENGTH_SHORT).show();
+                    MainActivity.this.finish();
+                }
+                break;
+
+            case 3:
+                if(grantResults[0]!= PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(MainActivity.this,"Програмі необхідний доступ для читання/запису",Toast.LENGTH_SHORT).show();
+                    MainActivity.this.finish();
+                }
+                break;
+        }
+    }
+
+    public  boolean isWriteStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                return false;
+            }
+        }
+        else {
+            return true;
+        }
+    }
     private class ButtonListeners implements View.OnClickListener {
 
         @Override
@@ -346,5 +419,67 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(InfoMusicActivity.getIntent(MainActivity.this),0, options.toBundle());
             }
         }
+    }
+    //
+    private boolean exist(){
+        return new File(getApplicationContext().getFilesDir(),"mydir").exists();
+    }
+
+    public String readFileOnInternalStorage(Context mcoContext,String sFileName){
+        File file = new File(mcoContext.getFilesDir(),"mydir");
+        StringBuffer stringBuffer = null;
+        try{
+            File gpxfile = new File(file, sFileName);
+            FileReader reader = new FileReader(gpxfile);
+            stringBuffer = new StringBuffer();
+            int numCharsRead;
+            char[] charArray = new char[1024];
+            while ((numCharsRead = reader.read(charArray)) > 0) {
+                stringBuffer.append(charArray, 0, numCharsRead);
+            }
+            reader.close();
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+        return stringBuffer.toString();
+    }
+    public void writeFileOnInternalStorage(Context mcoContext,String sFileName, String sBody){
+        File file = new File(mcoContext.getFilesDir(),"mydir");
+        if(!file.exists()){
+            file.mkdir();
+        }
+
+        try{
+            File gpxfile = new File(file, sFileName);
+            FileWriter writer = new FileWriter(gpxfile);
+            writer.append(sBody);
+            writer.flush();
+            writer.close();
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+    }
+    public void notif(){
+        if(!exist()){
+            writeFileOnInternalStorage(getApplicationContext(),"config.txt",Arrays.toString(MusicPlayer.mpl.getHrefArray()));
+            Toast.makeText(getApplicationContext(),"first",Toast.LENGTH_SHORT).show();
+            notification("Вітаємо у програмі.","Вперше у програмі");
+        } else {
+            String s = readFileOnInternalStorage(getApplicationContext(),"config.txt");
+            String s1 = Arrays.toString(MusicPlayer.mpl.getHrefArray());
+            if(isSame(s,s1)){
+            } else {
+                writeFileOnInternalStorage(getApplicationContext(),"config.txt",Arrays.toString(MusicPlayer.mpl.getHrefArray()));
+                notification("Музику оновлено!","Список музики");
+            }
+        }
+    }
+    public boolean isSame(String s,String s1){
+        return s.equals(s1);
+    }
+    public void notification(String s,String sub){
+        NotificationHelper.createNotification(getApplicationContext(),s,sub);
     }
 }
